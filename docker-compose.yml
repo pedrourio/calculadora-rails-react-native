@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+   db:
+     image: postgres:15 # Você pode escolher a versão do Postgres que preferir
+     container_name: calculadora_api_db
+     environment:
+       POSTGRES_USER: <%= ENV['DATABASE_USER'] %>
+       POSTGRES_PASSWORD: <%= ENV['DATABASE_PASSWORD'] %>
+       POSTGRES_DB: <%= ENV['DATABASE_NAME'] %>_development
+     ports:
+       - "5434:5432"
+     volumes:
+       - postgres_data:/var/lib/postgresql/data
+ 
+   web:
+     build: .
+     container_name: calculadora_api_web
+     command: bundle exec rails s -b 0.0.0.0
+     ports:
+       - "3000:3000"
+     depends_on:
+       - db
+     environment:
+       DATABASE_HOST: db
+       DATABASE_USER: <%= ENV['DATABASE_USER'] %>
+       DATABASE_PASSWORD: <%= ENV['DATABASE_PASSWORD'] %>
+       DATABASE_NAME: <%= ENV['DATABASE_NAME'] %>
+     volumes:
+       - .:/app
+ 
+volumes:
+   postgres_data:
